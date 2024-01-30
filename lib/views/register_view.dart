@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -18,6 +20,39 @@ class _RegisterViewState extends State<RegisterView> {
   TextEditingController uname= TextEditingController();
   TextEditingController cpassword = TextEditingController();
 
+
+    Future<void> insertrecord() async {
+    if(fname.text!="" || lname.text!="" || email.text!="" || phone.text!="" || password.text!="" || uname.text!=""  )
+    {
+      try{
+        String uri ="http://192.168.74.197/card_management/insert_record.php";
+
+        var res = await http.post(Uri.parse(uri),body: {
+          "fname": fname.text,
+          "lname": lname.text,
+          "email": email.text,
+          "phone": phone.text,
+          "password": password.text,
+          "uname": uname.text,
+        });
+        print('Raw Response: ${res.body}');
+
+        var response = jsonDecode(res.body);
+        if(response["success"]) {
+          print("Record inserted successfully");
+        } 
+        else {
+          print("Some issues were encountered");
+        }
+      }
+      catch(e){
+        print("Error decoding JSON response: $e");
+      }
+
+    } else {
+      print("Please fill all fields");
+    }
+  }
   
 
   bool _obscureText = true;
@@ -225,11 +260,10 @@ class _RegisterViewState extends State<RegisterView> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // All fields are valid, you can proceed with registration
-                    // Add your registration logic here
-                  }
-                },
+                    if (_formKey.currentState?.validate() ?? false) {
+                   insertrecord();
+                    }
+                  },
                 child: Text('Register'),
               ),
             ],
