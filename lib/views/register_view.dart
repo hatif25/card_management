@@ -25,7 +25,7 @@ class _RegisterViewState extends State<RegisterView> {
     if(fname.text!="" || lname.text!="" || email.text!="" || phone.text!="" || password.text!="" || uname.text!=""  )
     {
       try{
-        String uri ="http://192.168.74.197/card_management/insert_record.php";
+        String uri ="http://192.168.99.173/card_management/insert_record.php";
 
         var res = await http.post(Uri.parse(uri),body: {
           "fname": fname.text,
