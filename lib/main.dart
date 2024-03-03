@@ -1,3 +1,5 @@
+import 'package:card_management/utils/search_expenses.dart';
+import 'package:card_management/views/add_expense_details.dart';
 import 'package:card_management/views/credit_card_view.dart';
 import 'package:card_management/views/expenses_view.dart';
 import 'package:card_management/views/login_view.dart';

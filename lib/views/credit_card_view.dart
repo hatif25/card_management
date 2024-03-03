@@ -13,6 +13,7 @@ class CreditCardsPage extends StatefulWidget {
 class _CreditCardsPageState extends State<CreditCardsPage> {
   late Future<List<CreditCardInfo>> creditCardInfoFuture;
 
+
   @override
   void initState() {
     super.initState();
@@ -33,8 +34,9 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
       // If the server returns a 200 OK response,
       // then parse the JSON.
       List<dynamic> list = json.decode(response.body);
-      return List<CreditCardInfo>.from(
+      return  List<CreditCardInfo>.from(
           list.map((model) => CreditCardInfo.fromJson(model)));
+        
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -63,7 +65,10 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text("${snapshot.error}"));
                   } else if (snapshot.hasData) {
+                      List<CreditCardInfo> creditCardInfoList = snapshot.data!;
+                     print(creditCardInfoList[0].cardHolderName);
                     return ListView.builder(
+                      
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: snapshot.data!.length,
@@ -106,8 +111,7 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
   }
 
 
-
-  Card _buildCreditCard({
+    Card _buildCreditCard({
     required Color color,
     required String cardNumber,
     required String cardHolder,
@@ -179,6 +183,11 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
     );
   }
 
+
+
+
+  
+
   Column _buildDetailsBlock({required String label, required String value}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,3 +221,4 @@ String formatCardNumber(String cardNumber) {
   }
   return formatted;
 }
+

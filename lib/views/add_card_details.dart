@@ -127,7 +127,7 @@ class AddCardDetails extends StatelessWidget {
   onPressed: () async {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       var response = await http.post(
-        Uri.parse('http://192.168.247.173/practice/insert_cardDetails.php'),
+        Uri.parse('http://192.168.99.173/practice/insert_cardDetails.php'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
