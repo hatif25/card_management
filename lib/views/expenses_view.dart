@@ -7,9 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:card_management/models/expenses_model.dart';
 import 'package:card_management/utils/re_usable.dart';
 import 'package:flutter/material.dart';
-
 class ExpensesWidget extends StatefulWidget {
-  const ExpensesWidget({Key? key}) : super(key: key);
+  final String loggedInUsername;
+ const ExpensesWidget({Key? key, required this.loggedInUsername}) : super(key: key);
+
 
   @override
   State<ExpensesWidget> createState() => _ExpensesState();
@@ -18,7 +19,6 @@ class ExpensesWidget extends StatefulWidget {
 class _ExpensesState extends State<ExpensesWidget> {
   List<ExpensesInfo> _allExpenses = [];
   List<ExpensesInfo> _filteredExpenses = [];
-  
 
   @override
   void initState() {
@@ -27,13 +27,11 @@ class _ExpensesState extends State<ExpensesWidget> {
   }
 
   Future<void> fetchExpenses() async {
-    final response = await http
-        .get(Uri.parse('http://192.168.99.173/practice/expense_details.php'));
+    final response = await http.get(Uri.parse('http://192.168.205.173/practice/expense_details.php'));
 
     if (response.statusCode == 200) {
       List<dynamic> list = json.decode(response.body);
-      _allExpenses = List<ExpensesInfo>.from(
-          list.map((model) => ExpensesInfo.fromJson(model)));
+      _allExpenses = List<ExpensesInfo>.from(list.map((model) => ExpensesInfo.fromJson(model)));
       _filteredExpenses = List.from(_allExpenses);
       setState(() {});
     } else {
@@ -41,18 +39,21 @@ class _ExpensesState extends State<ExpensesWidget> {
     }
   }
 
-void filterExpenses(String searchText) {
-  String searchTextLower = searchText.toLowerCase();
-  _filteredExpenses = _allExpenses
-      .where((expense) =>
-          expense.amount.toLowerCase().contains(searchTextLower) ||
-          expense.category.toLowerCase().contains(searchTextLower) ||
-          expense.payee.toLowerCase().contains(searchTextLower) ||
-          expense.date_of_payment.toLowerCase().contains(searchTextLower)
-      )
-      .toList();
-  setState(() {});
-}
+  void filterExpenses(String searchText) {
+    String searchTextLower = searchText.toLowerCase();
+    _filteredExpenses = _allExpenses
+        .where((expense) =>
+            expense.amount.toLowerCase().contains(searchTextLower) ||
+            expense.category.toLowerCase().contains(searchTextLower) ||
+            expense.payee.toLowerCase().contains(searchTextLower) ||
+            expense.date_of_payment.toLowerCase().contains(searchTextLower))
+        .toList();
+    setState(() {});
+  }
+
+  void refreshfetchExpenses() {
+    fetchExpenses(); // Refresh the list of expenses
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,16 +67,20 @@ void filterExpenses(String searchText) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-              buildTitleSection(title: 'Expenses'),
-              Padding(
-                padding: const EdgeInsets.only(top:10.0),
-                child: IconButton(
-                  icon: Icon(Icons.add_circle_outline,color: Colors.black,size: 29),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: ((context) =>   AddExpenses())));
-                  }
-                ),
-              ),
+                  buildTitleSection(title: 'Expenses'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: IconButton(
+                        icon: Icon(Icons.add_circle_outline, color: Colors.black, size: 29),
+                        onPressed: () async {
+                          // Navigate to AddExpenses screen and wait for result
+                          await Navigator.of(context).push(MaterialPageRoute(
+                              builder: ((context) => AddExpenses(loggedInUsername: widget.loggedInUsername))));
+
+                          // Refresh the list of expenses after adding a new expense
+                          refreshfetchExpenses();
+                        }),
+                  ),
                 ],
               ),
               SizedBox(height: 14,),
@@ -86,7 +91,7 @@ void filterExpenses(String searchText) {
                 decoration: InputDecoration(
                   hintText: 'Search expenses',
                   labelText: 'Expenses',
-                  suffixIcon: Icon(Icons.search,color: Colors.black),
+                  suffixIcon: Icon(Icons.search, color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -100,12 +105,13 @@ void filterExpenses(String searchText) {
                 itemBuilder: (context, index) {
                   ExpensesInfo expensesInfo = _filteredExpenses[index];
                   return buildExpensesCard(
+                    trsnId: expensesInfo.trsn_id,
                     payee: expensesInfo.payee,
                     amount: expensesInfo.amount,
                     date: expensesInfo.date_of_payment,
                     category: expensesInfo.category,
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TransactionDetails()));
+                    onPressed: (trsnId) {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => TransactionDetails(trsnId: trsnId)));
                     },
                   );
                 },
@@ -113,7 +119,13 @@ void filterExpenses(String searchText) {
               buildAddCardButton(
                 icon: Icon(Icons.add),
                 color: Color(0xFF081603),
-                onPressed: () {},
+                onPressed: () async {
+                  // Navigate to AddExpenses screen and wait for result
+                  await Navigator.of(context).push(MaterialPageRoute(builder: ((context) => AddExpenses(loggedInUsername: widget.loggedInUsername))));
+
+                  // Refresh the list of expenses after adding a new expense
+                  refreshfetchExpenses();
+                },
               )
             ],
           ),

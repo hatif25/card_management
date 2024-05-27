@@ -7,8 +7,15 @@ import 'package:card_management/views/main_view.dart';
 import 'package:card_management/views/profile_view.dart';
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +30,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(fontFamily: 'Lato'),
       
       home: Scaffold(
-        body: MainWidget(),
+        body: LoginView(),
         
       ),
       

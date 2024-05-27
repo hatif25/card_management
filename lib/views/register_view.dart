@@ -1,3 +1,4 @@
+import 'package:card_management/utils/custom_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,38 +22,56 @@ class _RegisterViewState extends State<RegisterView> {
   TextEditingController cpassword = TextEditingController();
 
 
-    Future<void> insertrecord() async {
-    if(fname.text!="" || lname.text!="" || email.text!="" || phone.text!="" || password.text!="" || uname.text!=""  )
-    {
-      try{
-        String uri ="http://192.168.99.173/card_management/insert_record.php";
+  Future<void> insertrecord() async {
+  final url = "http://192.168.205.173/practice/insert_record.php";
 
-        var res = await http.post(Uri.parse(uri),body: {
-          "fname": fname.text,
-          "lname": lname.text,
-          "email": email.text,
-          "phone": phone.text,
-          "password": password.text,
-          "uname": uname.text,
-        });
-        print('Raw Response: ${res.body}');
+  try {
+    if (_formKey.currentState!.validate()) {
+      final response = await http.post(Uri.parse(url), body: {
+        "uname": uname.text,
+        "fname": fname.text,
+        "lname": lname.text,
+        "email": email.text,
+        "phone": phone.text,
+        "password": password.text,
+      });
 
-        var response = jsonDecode(res.body);
-        if(response["success"]) {
+      print('Raw Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Parse the JSON response
+        final responseBody = json.decode(response.body);
+
+        if (responseBody["success"] != null && responseBody["success"]) {
+          // Registration successful, show dialog
           print("Record inserted successfully");
-        } 
-        else {
-          print("Some issues were encountered");
+          await showGenericDialog(
+            context: context,
+            title: 'Registration Successful',
+            content: 'You have successfully registered.',
+            optionsBuilder: () {
+              return {
+                'OK': 'OK',
+              };
+            },
+          );
+        } else {
+          // Registration failed, show error message
+          print("Registration failed: ${responseBody["message"]}");
+          // Handle showing error message to user
         }
+      } else {
+        // Handle HTTP error response
+        print('HTTP Error: ${response.statusCode}');
       }
-      catch(e){
-        print("Error decoding JSON response: $e");
-      }
-
-    } else {
-      print("Please fill all fields");
     }
+  } catch (e) {
+    print("Error: $e");
   }
+}
+
+
+    
   
 
   bool _obscureText = true;

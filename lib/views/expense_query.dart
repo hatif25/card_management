@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:card_management/utils/re_usable.dart';
+import 'package:card_management/views/transaction_details.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -31,24 +33,40 @@ class _FilterScreenState extends State<FilterScreen> {
           SizedBox(height: 15,),
           buildTitleSection(title: 'Filter Expenses'),
           SizedBox(height: 15,),
-          TextField(
-            onChanged: (value) {
+        TextField(
+          onChanged: (value) {
+            setState(() {
               filterStartDate = value;
-            },
-            decoration: InputDecoration(
-              hintText: 'Enter start date',
-              labelText: 'Start Date',
-            ),
+            });
+          },
+          keyboardType: TextInputType.datetime,
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'[^\d-]')), // Allow only digits and hyphens
+            LengthLimitingTextInputFormatter(10), // Limit to 10 characters
+            _DateInputFormatter(), // Format the date as YYYY-MM-DD
+          ],
+          decoration: InputDecoration(
+            hintText: 'Enter start date (YYYY-MM-DD)',
+            labelText: 'Start Date',
           ),
-          TextField(
-            onChanged: (value) {
+        ),
+        TextField(
+          onChanged: (value) {
+            setState(() {
               filterEndDate = value;
-            },
-            decoration: InputDecoration(
-              hintText: 'Enter end date',
-              labelText: 'End Date',
-            ),
+            });
+          },
+          keyboardType: TextInputType.datetime,
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'[^\d-]')), // Allow only digits and hyphens
+            LengthLimitingTextInputFormatter(10), // Limit to 10 characters
+            _DateInputFormatter(), // Format the date as YYYY-MM-DD
+          ],
+          decoration: InputDecoration(
+            hintText: 'Enter end date (YYYY-MM-DD)',
+            labelText: 'End Date',
           ),
+        ),
           DropdownButtonFormField<String>(
             value: filterCategory,
             items: categories.map((String category) {
@@ -121,7 +139,7 @@ class _FilterScreenState extends State<FilterScreen> {
     }
   });
 
-  final url = "http://192.168.99.173/practice/expense_query.php";
+  final url = "http://192.168.205.173/practice/expense_query.php";
 
   try {
     final response = await http.post(
@@ -169,17 +187,46 @@ class FilteredExpensesScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final expense = expenses[index];
             return buildExpensesCard(
+              trsnId: expense['trsn_id'],
               payee: expense['payee'] ?? 'Payee not available',
               amount: expense['amount'] ?? 'Amount not available',
-              date: expense['date'] ?? 'Date not available',
-              category: expense['categories'] ?? 'Category not available',
-              onPressed: () {
-                // Handle onTap action if needed
-              },
+              date: expense['date_of_payment'] ?? 'Date not available',
+              category: expense['category'] ?? 'Category not available',
+                onPressed: (trsnId) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TransactionDetails(trsnId: trsnId)));
+  },
             );
           },
         ),
       ),
+    );
+  }
+}
+
+class _DateInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    var dateText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (dateText.length > 8) {
+      dateText = dateText.substring(0, 8);
+    }
+
+    var newText = '';
+    for (var i = 0; i < dateText.length; i++) {
+      if (i == 4 || i == 6) {
+        newText += '-';
+      }
+      newText += dateText[i];
+    }
+
+    return newValue.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }

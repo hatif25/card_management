@@ -37,12 +37,13 @@ Column buildTitleSection({String title = 'Build'}) {
 
 
 
-  Card buildExpensesCard({
+ Card buildExpensesCard({
+  required String trsnId,
   required String payee,
   required String amount,
   required String date,
   required String category,
-  required Function() onPressed,
+  required Function(String) onPressed,
 }) {
   return Card(
     elevation: 4.0,
@@ -51,30 +52,39 @@ Column buildTitleSection({String title = 'Build'}) {
       borderRadius: BorderRadius.circular(10),
     ),
     child: GestureDetector(
-      onTap: onPressed,
+      onTap: () {
+        onPressed(trsnId); // Pass trsn_id to onPressed callback
+      },
       child: Container(
         height: 80,
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 22.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              // mainAxisAlignment: MainAxisAlignment.start,
-
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    payee,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  payee,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                Spacer(),
+                SizedBox(height: 4),
+                Text(
+                  category,
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 Text(
                   '₹$amount',
                   style: TextStyle(
@@ -82,18 +92,7 @@ Column buildTitleSection({String title = 'Build'}) {
                     fontSize: 15,
                   ),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 0.5, left: 10),
-                  child: Text(
-                    category,
-                    style: TextStyle(color: Colors.white, fontSize: 15),
-                  ),
-                ),
-                Spacer(),
+                SizedBox(height: 4),
                 Text(
                   date,
                   style: TextStyle(color: Colors.white),

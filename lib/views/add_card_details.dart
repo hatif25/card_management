@@ -4,15 +4,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AddCardDetails extends StatelessWidget {
-  AddCardDetails({super.key});
+  final String loggedInUsername;
+
+  AddCardDetails({Key? key, required this.loggedInUsername}) : super(key: key);
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  TextEditingController cNumber = new TextEditingController();
-  TextEditingController expiry = new TextEditingController();
-  TextEditingController name = new TextEditingController();
-  TextEditingController bankname = new TextEditingController();
-
-
+  TextEditingController cNumber = TextEditingController();
+  TextEditingController expiry = TextEditingController();
+  TextEditingController name = TextEditingController();
+  TextEditingController bankname = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +28,7 @@ class AddCardDetails extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   TextFormField(
                     controller: cNumber,
                     decoration: InputDecoration(
@@ -102,7 +101,6 @@ class AddCardDetails extends StatelessWidget {
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            // Limit the input
                             LengthLimitingTextInputFormatter(4),
                           ],
                           decoration: const InputDecoration(
@@ -120,38 +118,52 @@ class AddCardDetails extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(
-              height: 15,
-            ),
-          ElevatedButton(
-  onPressed: () async {
-    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      var response = await http.post(
-        Uri.parse('http://192.168.99.173/practice/insert_cardDetails.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'cardNumber': cNumber.text,
-          'expiry': expiry.text,
-          'name': name.text,
-          'bankName': bankname.text,
-        }),
-      );
-      if (response.statusCode == 200) {
-        // If the server returns a 200 OK response,
-        // then parse the JSON.
-        print('Response data: ${response.body}');
-      } else {
-        // If the server returns an unexpected response,
-        // then throw an exception.
-        throw Exception('Failed to load data');
-      }
-    }
-  },
-  child: const Text('Insert Card Details'),
-),
+            SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: () async {
+                if (_formKey.currentState != null &&
+                    _formKey.currentState!.validate()) {
+                  var response = await http.post(
+                    Uri.parse(
+                        'http://192.168.205.173/practice/insert_cardDetails.php'),
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, String>{
+                      'uname': loggedInUsername,
+                      'cardNumber': cNumber.text,
+                      'expiry': expiry.text,
+                      'name': name.text,
+                      'bankName': bankname.text,
+                    }),
+                  );
 
+                  print('Response status code: ${response.statusCode}');
+                  print('Response body: ${response.body}');
+
+                  if (response.statusCode == 200) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Card details inserted successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    print('Response data: ${response.body}');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Failed to insert card details, card may already exist '),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    throw Exception(
+                        'Failed to load data: ${response.body}');
+                  }
+                }
+              },
+              child: const Text('Insert Card Details'),
+            ),
           ],
         ),
       ),

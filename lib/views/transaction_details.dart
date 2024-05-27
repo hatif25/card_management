@@ -1,147 +1,109 @@
+import 'dart:convert';
+
+import 'package:card_management/models/transaction_model.dart';
 import 'package:card_management/utils/re_usable.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class TransactionDetails extends StatelessWidget {
-  const TransactionDetails({super.key});
+class TransactionDetails extends StatefulWidget {
+  final String trsnId;
+
+  const TransactionDetails({Key? key, required this.trsnId}) : super(key: key);
+
+  @override
+  _TransactionDetailsState createState() => _TransactionDetailsState();
+}
+
+class _TransactionDetailsState extends State<TransactionDetails> {
+  late Future<List<TransactionDetailsModel>> _transactionDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    _transactionDetails = fetchTransactionDetails(widget.trsnId);
+  }
+
+  Future<List<TransactionDetailsModel>> fetchTransactionDetails(String trsnId) async {
+    final response = await http.get(Uri.parse('http://192.168.205.173/practice/show_transactionDetails.php?trsn_id=$trsnId'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      if (data is List) {
+        return data.map((item) => TransactionDetailsModel.fromJson(item)).toList();
+      } else {
+        throw Exception('Data is not a list');
+      }
+    } else {
+      throw Exception('Failed to load transaction details: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildTitleSection(title: 'Transaction Details'),
-            Padding(padding: EdgeInsets.all(10)),
-            SizedBox(height: 100,),
-            Center(
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Container(
-                  color: Colors.teal,
-                  width: double.infinity,
-                  height: 400,
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.start,
-                    // crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Text(
-                        'Uco Bank',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildTitleSection(title: 'Transaction Details'),
+          Expanded(
+            child: FutureBuilder<List<TransactionDetailsModel>>(
+              future: _transactionDetails,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final transactionData = snapshot.data![index];
+                      return Card(
+                        color: Colors.teal,
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        '1258 7895 2546 7856',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontFamily: 'Courier New',
-                          fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Card Number: ${transactionData.cardNumber ?? 'N/A'}',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                              Text(
+                                'Amount: Rs. ${transactionData.amount ?? 'N/A'}',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                              Text(
+                                'Transaction ID: ${transactionData.transactionId ?? 'N/A'}',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                              Text(
+                                'To: ${transactionData.payee ?? 'N/A'}',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                              Text(
+                                'Date: ${transactionData.date ?? 'N/A'}',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                              Text(
+                                'Category: ${transactionData.category ?? 'N/A'}',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Divider(
-                        color: Colors.black,
-                        thickness: 1,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Align(
-                        heightFactor: 1.2,
-                        child: Column(
-                          children: [
-                            Text(
-                              'Amount',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              'Rs. 1000',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            SizedBox(height: 8,),
-                            Text(
-                              'Transaction ID',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              '2545786845',
-                              style: TextStyle(color: Colors.black, fontSize: 15),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'To : Muneeb Bashir',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              'Mar 2, 2024 12:08 PM',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              'Category',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              'Condiments',
-                              style: TextStyle(color: Colors.black, fontSize: 15),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
+                      );
+                    },
+                  );
+                }
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
