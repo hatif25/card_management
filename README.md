@@ -50,14 +50,17 @@ Card Management is a comprehensive solution designed to manage various types of 
 
 ## Screenshots
 
-### Dashboard
-![Dashboard](images/dashboard.png)
+### Card View
+![Card View](images/cardview.jpeg)
 
-### Card Management
-![Card Management](images/card_management.png)
+### Expenses View
+![Expenses View](images/expenses_list.jpg)
 
-### Expense Tracking
-![Expense Tracking](images/expense_tracking.png)
+### Transaction Detail
+![Transaction Detail](images/transaction_detail.jpg)
+
+### Filter Expenses
+![Filter Expenses](images/filter_expenses.jpg)
 
 ## Contributing
 
