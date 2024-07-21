@@ -69,4 +69,4 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 ## Contact
 
-For any queries, feel free to reach out at [your email](mailto:mthraza72@gmail.com).
+For any queries, feel free to reach out at [my email(mailto:mthraza72@gmail.com).
