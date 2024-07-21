@@ -1,16 +1,69 @@
-# card_management
+# Card Management
 
-A new Flutter project.
+## Overview
 
-## Getting Started
+Card Management is a comprehensive solution designed to manage various types of cards and track expenses efficiently. The project leverages Flutter for the frontend and PHP for the backend, with MySQL as the database, all hosted on XAMPP for a seamless development experience.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- **Card Management**: Add, update, and delete different types of cards.
+- **Expense Tracking**: Track expenses linked to each card, providing insights and analysis.
+- **Optimized Database**: Efficient data storage and retrieval using MySQL.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Tools & Technologies
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Frontend**: Flutter
+- **Backend**: PHP
+- **Database**: MySQL
+- **Server**: XAMPP
+
+## Installation
+
+### Prerequisites
+
+- Flutter installed on your machine.
+- XAMPP installed and running.
+- MySQL database setup.
+
+### Steps
+
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/yourusername/card-management.git
+    cd card-management
+    ```
+
+2. **Setup the Backend**:
+    - Place the PHP files in the `htdocs` directory of your XAMPP installation.
+    - Create a MySQL database and import the provided SQL dump file located in the `database` folder.
+
+3. **Setup the Frontend**:
+    ```bash
+    flutter pub get
+    flutter run
+    ```
+
+## Usage
+
+1. **Start XAMPP**: Ensure Apache and MySQL are running.
+2. **Run the Flutter App**: Use the command `flutter run` in the project directory.
+
+## Screenshots
+
+### Dashboard
+![Dashboard](images/dashboard.png)
+
+### Card Management
+![Card Management](images/card_management.png)
+
+### Expense Tracking
+![Expense Tracking](images/expense_tracking.png)
+
+## Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request for any improvements.
+
+
+## Contact
+
+For any queries, feel free to reach out at [your email](mailto:mthraza72@gmail.com).
